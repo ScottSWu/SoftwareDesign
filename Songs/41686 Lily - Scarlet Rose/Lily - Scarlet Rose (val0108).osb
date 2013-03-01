@@ -1,0 +1,368 @@
+[Events]
+//Background and Video events
+//Storyboard Layer 0 (Background)
+Sprite,Background,Centre,"SB\2.jpg",320,240
+ S,0,90734,,0.8
+ F,0,90734,102734,0,1
+ M,0,90734,108734,320,240
+ F,0,107234,108734,1,0
+Sprite,Background,Centre,"SB\2.jpg",320,240
+ S,0,-16,6734,0.8
+ F,0,4484,6734,1,0
+Sprite,Background,Centre,"SB\2.jpg",320,240
+ M,0,126734,,320,240
+ S,0,126734,,0.8
+ F,0,126734,127109,0,1
+ F,0,149609,151109,1,0
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+Sprite,Foreground,Centre,"SB\ugoki.png",320,240
+ M,0,18734,19390,464,326
+Sprite,Foreground,Centre,"SB\kanjou.png",320,240
+ M,0,19484,20140,464,326
+Sprite,Foreground,Centre,"SB\kisimi.png",320,240
+ M,0,20234,21359,464,326
+ M,0,21359,,320,240
+Sprite,Foreground,Centre,"SB\dakedo.png",320,240
+ M,0,21452,21640,464,326
+Sprite,Foreground,Centre,"SB\watasiha.png",320,240
+ M,0,21734,22202,464,326
+Sprite,Foreground,Centre,"SB\sinjiteta.png",320,240
+ M,0,22296,22952,464,326
+Sprite,Foreground,Centre,"SB\anataga.png",320,240
+ M,0,23046,23327,464,326
+Sprite,Foreground,Centre,"SB\aqisituduketeru.png",320,240
+ M,0,23421,24640,464,326
+Sprite,Foreground,Centre,"SB\nigetuduketaru.png",320,240
+ M,0,24734,25859,464,326
+Sprite,Foreground,Centre,"SB\watasiniha.png",320,240
+ M,0,25952,26327,464,326
+Sprite,Foreground,Centre,"SB\rikaidekinakute.png",320,240
+ M,0,26421,27640,464,326
+Sprite,Foreground,Centre,"SB\hanasanaide.png",320,240
+ M,0,27734,28390,464,326
+Sprite,Foreground,Centre,"SB\watasinotewo.png",320,240
+ M,0,28484,29140,464,326
+Sprite,Foreground,Centre,"SB\itumademo.png",320,240
+ M,0,29234,29890,464,326
+Sprite,Foreground,Centre,"SB\dakisimete.png",320,240
+ M,0,29984,30734,464,326
+Sprite,Foreground,Centre,"SB\utumukigatina.png",320,240
+ M,0,42734,43952,464,326
+Sprite,Foreground,Centre,"SB\kokorowosarasitemo.png",320,240
+ M,0,44046,45640,464,326
+Sprite,Foreground,Centre,"SB\nanimokanjirarezu.png",320,240
+ M,0,45734,47140,464,326
+Sprite,Foreground,Centre,"SB\kurusii.png",320,240
+ M,0,47234,48640,464,326
+Sprite,Foreground,Centre,"SB\itizunaaiha.png",320,240
+ M,0,48734,49952,464,326
+Sprite,Foreground,Centre,"SB\anatadakewomitukemete.png",320,240
+ M,0,50046,51640,464,326
+Sprite,Foreground,Centre,"SB\hokanihananimo.png",320,240
+ M,0,51734,52952,464,326
+Sprite,Foreground,Centre,"SB\mienakunatteiku.png",320,240
+ M,0,53046,55577,464,326
+Sprite,Foreground,Centre,"SB\namidaha.png",320,240
+ M,0,55671,56515,464,326
+Sprite,Foreground,Centre,"SB\askakisizukukara.png",320,240
+ M,0,56609,58577,464,326
+Sprite,Foreground,Centre,"SB\naniwokanjiruno.png",320,240
+ M,0,58671,60265,464,326
+Sprite,Foreground,Centre,"SB\huretakute.png",320,240
+ M,0,60359,61577,464,326
+Sprite,Foreground,Centre,"SB\dakisimeraretakute.png",320,240
+ M,0,61671,63640,464,326
+Sprite,Foreground,Centre,"SB\imaha.png",320,240
+ M,0,63734,64577,464,326
+Sprite,Foreground,Centre,"SB\nanimomienakute.png",320,240
+ M,0,64671,66640,464,326
+Sprite,Foreground,Centre,"SB\ugoki.png",320,240
+ M,0,66734,67390,464,326
+Sprite,Foreground,Centre,"SB\kanjou.png",320,240
+ M,0,67484,68140,464,326
+Sprite,Foreground,Centre,"SB\kisimi.png",320,240
+ M,0,68234,69359,464,326
+Sprite,Foreground,Centre,"SB\dakedo.png",320,240
+ M,0,69452,69640,464,326
+Sprite,Foreground,Centre,"SB\watasiha.png",320,240
+ M,0,69734,70202,464,326
+Sprite,Foreground,Centre,"SB\sinjiteta.png",320,240
+ M,0,70296,70859,464,326
+Sprite,Foreground,Centre,"SB\anataga.png",320,240
+ M,0,70952,71327,464,326
+Sprite,Foreground,Centre,"SB\aqisituduketeru.png",320,240
+ M,0,71421,72640,464,326
+Sprite,Foreground,Centre,"SB\nigetuduketaru.png",320,240
+ M,0,72734,73765,464,326
+Sprite,Foreground,Centre,"SB\watasiniha.png",320,240
+ M,0,73859,74327,464,326
+Sprite,Foreground,Centre,"SB\rikaidekinakute.png",320,240
+ M,0,74421,75640,464,326
+Sprite,Foreground,Centre,"SB\hanasanaide.png",320,240
+ M,0,75734,76390,464,326
+Sprite,Foreground,Centre,"SB\watasinotewo.png",320,240
+ M,0,76484,77140,464,326
+Sprite,Foreground,Centre,"SB\itumademo.png",320,240
+ M,0,77246,77890,464,326
+Sprite,Foreground,Centre,"SB\dakisimete.png",320,240
+ M,0,77984,78640,464,326
+Sprite,Foreground,Centre,"SB\nukedasenai.png",320,240
+ M,0,78734,79390,464,326
+Sprite,Foreground,Centre,"SB\omoideha.png",320,240
+ M,0,79484,80046,464,326
+Sprite,Foreground,Centre,"SB\watasiwo.png",320,240
+ M,0,80140,80515,464,326
+Sprite,Foreground,Centre,"SB\kurusimetuduke.png",320,240
+ M,0,80609,81640,464,326
+Sprite,Foreground,Centre,"SB\kousasuru.png",320,240
+ M,0,81734,82296,464,326
+Sprite,Foreground,Centre,"SB\kanjou.png",320,240
+ M,0,82390,82952,464,326
+Sprite,Foreground,Centre,"SB\rasennnonakani.png",320,240
+ M,0,83046,83890,464,326
+Sprite,Foreground,Centre,"SB\torawareru.png",320,240
+ M,0,83984,84640,464,326
+Sprite,Foreground,Centre,"SB\haitukubattedemo.png",320,240
+ M,0,84734,85859,464,326
+Sprite,Foreground,Centre,"SB\anatani.png",320,240
+ M,0,85952,86234,464,326
+Sprite,Foreground,Centre,"SB\tikadukitakute.png",320,240
+ M,0,86327,87359,464,326
+Sprite,Foreground,Centre,"SB\imamo.png",320,240
+ M,0,87452,87640,464,326
+Sprite,Foreground,Centre,"SB\gensouwoidaite.png",320,240
+ M,0,87734,88671,464,326
+Sprite,Foreground,Centre,"SB\hatenakiyumewo.png",320,240
+ M,0,88765,89515,464,326
+Sprite,Foreground,Centre,"SB\mituduketeita.png",320,240
+ M,0,89609,90734,464,326
+Sprite,Foreground,Centre,"SB\kurayaminonakade.png",320,240
+ M,0,102734,104046,464,326
+Sprite,Foreground,Centre,"SB\anatawokanjite.png",320,240
+ M,0,104140,105640,464,326
+Sprite,Foreground,Centre,"SB\hadakanomamade.png",320,240
+ M,0,105734,106952,464,326
+Sprite,Foreground,Centre,"SB\dakiyoseteyo.png",320,240
+ M,0,107046,108640,464,326
+Sprite,Foreground,Centre,"SB\hokanoonnnanannte.png",320,240
+ M,0,108734,110140,464,326
+Sprite,Foreground,Centre,"SB\korositeageru.png",320,240
+ M,0,110234,111640,464,326
+Sprite,Foreground,Centre,"SB\konoyode.png",320,240
+ M,0,111734,112484,464,326
+Sprite,Foreground,Centre,"SB\anatawoaiserunoha.png",320,240
+ M,0,112577,114640,464,326
+Sprite,Foreground,Centre,"SB\hitori.png",320,240
+ M,0,114734,115577,464,326
+Sprite,Foreground,Centre,"SB\watasiigainihainaiyo.png",320,240
+ M,0,115671,118577,464,326
+Sprite,Foreground,Centre,"SB\kuruosiihodoni.png",320,240
+ M,0,118671,120265,464,326
+Sprite,Foreground,Centre,"SB\midarezaku.png",320,240
+ M,0,120359,121577,464,326
+Sprite,Foreground,Centre,"SB\baranotogegasasaru.png",320,240
+ M,0,121671,123640,464,326
+Sprite,Foreground,Centre,"SB\itamisaemo.png",320,240
+ M,0,123734,125140,464,326
+Sprite,Foreground,Centre,"SB\itosikute.png",320,240
+ M,0,125234,127015,464,326
+ F,0,126734,127015,1,0
+Sprite,Foreground,Centre,"SB\ugoki.png",320,240
+ M,0,127109,127859,464,326
+Sprite,Foreground,Centre,"SB\kanjou.png",320,240
+ M,0,127952,128515,464,326
+Sprite,Foreground,Centre,"SB\kisimi.png",320,240
+ M,0,128609,129734,464,326
+Sprite,Foreground,Centre,"SB\dakedo.png",320,240
+ M,0,129827,130015,464,326
+Sprite,Foreground,Centre,"SB\watasiha.png",320,240
+ M,0,130109,130577,464,326
+Sprite,Foreground,Centre,"SB\sinjiteta.png",320,240
+ M,0,130671,131327,464,326
+Sprite,Foreground,Centre,"SB\anataga.png",320,240
+ M,0,131421,131702,464,326
+Sprite,Foreground,Centre,"SB\aqisituduketeru.png",320,240
+ M,0,131796,133015,464,326
+Sprite,Foreground,Centre,"SB\nigetuduketaru.png",320,240
+ M,0,133109,134234,464,326
+Sprite,Foreground,Centre,"SB\watasiniha.png",320,240
+ M,0,134327,134702,464,326
+Sprite,Foreground,Centre,"SB\rikaidekinakute.png",320,240
+ M,0,134796,136015,464,326
+Sprite,Foreground,Centre,"SB\hanasanaide.png",320,240
+ M,0,136109,136765,464,326
+Sprite,Foreground,Centre,"SB\watasinotewo.png",320,240
+ M,0,136859,137515,464,326
+Sprite,Foreground,Centre,"SB\itumademo.png",320,240
+ M,0,137609,138265,464,326
+Sprite,Foreground,Centre,"SB\dakisimete.png",320,240
+ M,0,138359,139015,464,326
+Sprite,Foreground,Centre,"SB\nukedasenai.png",320,240
+ M,0,139109,139765,464,326
+Sprite,Foreground,Centre,"SB\omoideha.png",320,240
+ M,0,139859,140421,464,326
+Sprite,Foreground,Centre,"SB\watasiwo.png",320,240
+ M,0,140515,140890,464,326
+Sprite,Foreground,Centre,"SB\kurusimetuduke.png",320,240
+ M,0,140984,142015,464,326
+Sprite,Foreground,Centre,"SB\kousasuru.png",320,240
+ M,0,142109,142671,464,326
+Sprite,Foreground,Centre,"SB\kanjou.png",320,240
+ M,0,142765,143234,464,326
+Sprite,Foreground,Centre,"SB\rasennnonakani.png",320,240
+ M,0,143327,144265,464,326
+Sprite,Foreground,Centre,"SB\torawareru.png",320,240
+ M,0,144359,145015,464,326
+Sprite,Foreground,Centre,"SB\haitukubattedemo.png",320,240
+ M,0,145109,146234,464,326
+Sprite,Foreground,Centre,"SB\anatani.png",320,240
+ M,0,146327,146609,464,326
+Sprite,Foreground,Centre,"SB\tikadukitakute.png",320,240
+ M,0,146702,147734,464,326
+Sprite,Foreground,Centre,"SB\imamo.png",320,240
+ M,0,147827,148015,464,326
+Sprite,Foreground,Centre,"SB\gensouwoidaite.png",320,240
+ M,0,148109,149046,464,326
+Sprite,Foreground,Centre,"SB\hatenakiyumewo.png",320,240
+ M,0,149140,149890,464,326
+Sprite,Foreground,Centre,"SB\mituduketeita.png",320,240
+ M,0,149984,151015,464,326
+Sprite,Foreground,Centre,"SB\tukisasita.png",320,240
+ M,0,151109,152234,464,326
+Sprite,Foreground,Centre,"SB\hukaku.png",320,240
+ M,0,152327,152515,464,326
+Sprite,Foreground,Centre,"SB\subetewo.png",320,240
+ M,0,152609,153077,464,326
+Sprite,Foreground,Centre,"SB\nomikonndeiku.png",320,240
+ M,0,153171,154015,464,326
+Sprite,Foreground,Centre,"SB\tobitiru.png",320,240
+ M,0,154109,154577,464,326
+Sprite,Foreground,Centre,"SB\senketuga.png",320,240
+ M,0,154671,155234,464,326
+Sprite,Foreground,Centre,"SB\watasiwo.png",320,240
+ M,0,155327,155609,464,326
+Sprite,Foreground,Centre,"SB\akaku.png",320,240
+ M,0,155702,156077,464,326
+Sprite,Foreground,Centre,"SB\sometuduketeru.png",320,240
+ M,0,156171,157015,464,326
+Sprite,Foreground,Centre,"SB\setunani.png",320,240
+ M,0,157109,157577,464,326
+Sprite,Foreground,Centre,"SB\tikatta.png",320,240
+ M,0,157671,158234,464,326
+Sprite,Foreground,Centre,"SB\tada.png",320,240
+ M,0,158327,158421,464,326
+Sprite,Foreground,Centre,"SB\kuruosii.png",320,240
+ M,0,158515,159077,464,326
+Sprite,Foreground,Centre,"SB\aijoudakeha.png",320,240
+ M,0,159171,160015,464,326
+Sprite,Foreground,Centre,"SB\imamo.png",320,240
+ M,0,160109,160411,464,326
+Sprite,Foreground,Centre,"SB\itidunaomoi.png",320,240
+ M,0,160484,161327,464,326
+Sprite,Foreground,Centre,"SB\tadajunnsuide.png",320,240
+ M,0,161421,162265,464,326
+Sprite,Foreground,Centre,"SB\mukunadake.png",320,240
+ M,0,162359,163015,464,326
+Sprite,Foreground,Centre,"SB\nanimokamo.png",320,240
+ M,0,163109,163671,464,326
+Sprite,Foreground,Centre,"SB\korositemo.png",320,240
+ M,0,163765,164421,464,326
+Sprite,Foreground,Centre,"SB\nanimo.png",320,240
+ M,0,164515,164702,464,326
+Sprite,Foreground,Centre,"SB\mawariga.png",320,240
+ M,0,164796,165359,464,326
+Sprite,Foreground,Centre,"SB\mienakute.png",320,240
+ M,0,165452,166015,464,326
+Sprite,Foreground,Centre,"SB\isikiwo.png",320,240
+ M,0,166109,166577,464,326
+Sprite,Foreground,Centre,"SB\hakaisareta.png",320,240
+ M,0,166671,167327,464,326
+Sprite,Foreground,Centre,"SB\syoujoha.png",320,240
+ M,0,167421,167702,464,326
+Sprite,Foreground,Centre,"SB\naniwo.png",320,240
+ M,0,167796,168265,464,326
+Sprite,Foreground,Centre,"SB\negaunoka.png",320,240
+ M,0,168359,169015,464,326
+Sprite,Foreground,Centre,"SB\tada.png",320,240
+ M,0,169109,169202,464,326
+Sprite,Foreground,Centre,"SB\warasinagara.png",320,240
+ M,0,169296,170046,464,326
+Sprite,Foreground,Centre,"SB\sonoyaibawo.png",320,240
+ M,0,170140,170702,464,326
+Sprite,Foreground,Centre,"SB\jibunnni.png",320,240
+ M,0,170796,171359,464,326
+Sprite,Foreground,Centre,"SB\tukisasite.png",320,240
+ M,0,171452,172015,464,326
+Sprite,Foreground,Centre,"SB\subeteno.png",320,240
+ M,0,172109,172577,464,326
+Sprite,Foreground,Centre,"SB\nikusimiga.png",320,240
+ M,0,172671,173234,464,326
+Sprite,Foreground,Centre,"SB\sizukani.png",320,240
+ M,0,173327,173609,464,326
+Sprite,Foreground,Centre,"SB\tuieta.png",320,240
+ M,0,173702,174265,464,326
+Sprite,Foreground,Centre,"SB\syunnkannni.png",320,240
+ M,0,174359,175109,464,326
+//Storyboard Sound Samples
+Sample,19859,0,"normal-hitclap.wav",85
+Sample,21359,0,"normal-hitclap.wav",85
+Sample,22859,0,"normal-hitclap.wav",85
+Sample,24359,0,"normal-hitclap.wav",85
+Sample,25859,0,"normal-hitclap.wav",85
+Sample,27359,0,"normal-hitclap.wav",85
+Sample,28859,0,"normal-hitclap.wav",80
+Sample,43859,0,"normal-hitclap.wav",80
+Sample,45359,0,"normal-hitclap.wav",80
+Sample,46859,0,"normal-hitclap.wav",80
+Sample,51359,0,"normal-hitclap.wav",80
+Sample,52859,0,"normal-hitclap.wav",80
+Sample,55109,0,"normal-hitclap.wav",80
+Sample,57359,0,"normal-hitclap.wav",80
+Sample,58109,0,"normal-hitclap.wav",80
+Sample,61109,0,"normal-hitclap.wav",80
+Sample,63359,0,"normal-hitclap.wav",80
+Sample,64109,0,"normal-hitclap.wav",80
+Sample,67859,0,"normal-hitclap.wav",85
+Sample,69359,0,"normal-hitclap.wav",85
+Sample,70859,0,"normal-hitclap.wav",85
+Sample,72359,0,"normal-hitclap.wav",85
+Sample,73859,0,"normal-hitclap.wav",85
+Sample,75359,0,"normal-hitclap.wav",85
+Sample,76859,0,"normal-hitclap.wav",85
+Sample,78359,0,"normal-hitclap.wav",85
+Sample,79859,0,"normal-hitclap.wav",85
+Sample,81359,0,"normal-hitclap.wav",85
+Sample,82859,0,"normal-hitclap.wav",85
+Sample,84359,0,"normal-hitclap.wav",85
+Sample,85859,0,"normal-hitclap.wav",85
+Sample,87359,0,"normal-hitclap.wav",85
+Sample,88859,0,"normal-hitclap.wav",85
+Sample,109859,0,"normal-hitclap.wav",80
+Sample,111359,0,"normal-hitclap.wav",80
+Sample,112859,0,"normal-hitclap.wav",80
+Sample,115109,0,"normal-hitclap.wav",80
+Sample,117359,0,"normal-hitclap.wav",80
+Sample,118109,0,"normal-hitclap.wav",80
+Sample,123359,0,"normal-hitclap.wav",80
+Sample,124109,0,"normal-hitclap.wav",80
+Sample,152234,0,"normal-hitclap.wav",85
+Sample,153734,0,"normal-hitclap.wav",85
+Sample,155234,0,"normal-hitclap.wav",85
+Sample,156734,0,"normal-hitclap.wav",85
+Sample,158234,0,"normal-hitclap.wav",85
+Sample,159734,0,"normal-hitclap.wav",85
+Sample,164234,0,"normal-hitclap.wav",90
+Sample,165734,0,"normal-hitclap.wav",90
+Sample,167234,0,"normal-hitclap.wav",90
+Sample,168734,0,"normal-hitclap.wav",90
+Sample,170234,0,"normal-hitclap.wav",90
+Sample,171734,0,"normal-hitclap.wav",80
+Sample,176234,0,"normal-hitclap.wav",80
+Sample,177734,0,"normal-hitclap.wav",80
+Sample,179234,0,"normal-hitclap.wav",80
+Sample,180734,0,"normal-hitclap.wav",80
+Sample,182234,0,"normal-hitclap.wav",80
+Sample,183734,0,"normal-hitclap.wav",80
+Sample,185234,0,"normal-hitclap.wav",80
