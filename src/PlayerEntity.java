@@ -5,9 +5,12 @@ public class PlayerEntity extends Entity {
 	private double[] circleArray = Geometry.getCircle(8,16,0);
 	public double flash = 0;
 	public int hits;
+	public double health;
 	
 	public PlayerEntity() {
 		super();
+		hits = 0;
+		health = 1;
 	}
 	
 	public void render(GL glo) {
@@ -39,10 +42,15 @@ public class PlayerEntity extends Entity {
 		if (flash>0) {
 			flash -= elapsed;
 		}
+		health += elapsed/25;
+		if (health>1) health = 1;
 	}
 	
 	public void hit() {
 		hits++;
+		health -= 0.1;
 		flash = 1;
+		
+		if (health<0) health = 0;
 	}
 }

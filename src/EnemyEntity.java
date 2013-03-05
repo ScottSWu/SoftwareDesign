@@ -6,20 +6,21 @@ public class EnemyEntity extends Entity {
 	private double[] circleArray = Geometry.getCircle(1,32,0);
 	public double size;
 	public float[] color = {1f,1f,1f};
+	public double pulse;
 	
 	public EnemyEntity() {
 		super();
 		size = 1;
+		pulse = 0;
 	}
 	
 	public void render(GL glo) {
 		glo.glColor3f(1f,1f,1f);
 		glo.glPushMatrix();
 		glo.glTranslated(position.x,position.y,0);
-		glo.glScaled(size,size,size);
 		glo.glBegin(GL.GL_POLYGON);
 		for (int i=0; i<circleArray.length; i+=2) {
-			glo.glVertex2dv(circleArray,i);
+			glo.glVertex2d(size*circleArray[i],size*circleArray[i+1]);
 		}
 		glo.glEnd();
 		glo.glColor3fv(color,0);

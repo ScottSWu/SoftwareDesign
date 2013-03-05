@@ -6,8 +6,9 @@ public class BulletEntity extends Entity {
 	public static int TYPE_DEFAULT = 0;
 	
 	public Vector direction;
-	private double[] circleArray = Geometry.getCircle(3,16,0);
+	private double[] circleArray = Geometry.getCircle(1,16,0);
 	public int type = 0;
+	public double size = 3;
 	
 	public BulletEntity() {
 		super();
@@ -20,7 +21,7 @@ public class BulletEntity extends Entity {
 		glo.glTranslated(position.x,position.y,0);
 		glo.glBegin(GL.GL_POLYGON);
 		for (int i=0; i<circleArray.length; i+=2) {
-			glo.glVertex2dv(circleArray,i);
+			glo.glVertex2d(size*circleArray[i],size*circleArray[i+1]);
 		}
 		glo.glEnd();
 		glo.glPopMatrix();
