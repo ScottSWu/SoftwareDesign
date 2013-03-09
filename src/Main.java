@@ -13,7 +13,7 @@ public class Main {
 	
 	// Variables
 	private static JFrame window;
-	private static DodgeCanvas canvas;
+	private static GameCanvas canvas;
 	private static Dimension screenSize;
 	private static FPSAnimator animator;
 	
@@ -34,7 +34,7 @@ public class Main {
 			Dimension adjustedSize = new Dimension(2*screenSize.width - actualSize.width,2*screenSize.height - actualSize.height);
 			window.setSize(adjustedSize);
 		}
-		canvas = new DodgeCanvas(screenSize);
+		canvas = new GameCanvas(screenSize);
 		window.add(canvas);
 		
 		animator = new FPSAnimator(canvas,120);

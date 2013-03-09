@@ -6,20 +6,30 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.media.opengl.GL;
+import javax.media.opengl.GLException;
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureIO;
 import funnytrees.JOsu.OsuData.*;
 import funnytrees.JAudioPlayer.*;
 
-public class Game implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener{
+public class Game implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener {
 	private Dimension screen;
 	private Dimension bounds,movementField,appearField;
 	private boolean keys[] = new boolean[256];
 	
+	// Game variables
 	public long time;
 	private PlayerEntity player;
 	private ArrayList<EnemyEntity> enemies;
 	private ArrayList<BulletEntity> bullets;
+	private String songFolder,songMap;
+	
+	// Graphics
+	private Texture background;
 	
 	// Prototype test
 	private OsuBeatmap map;
@@ -27,35 +37,46 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	private int hitoffset;
 	private long approachSpeed = 800;
 	private int hitSize = 30;
+	private long score = 0;
 	
 	// Display animations
 	private double healthAnimation;
 	
-	public Game(Dimension dim) {
+	public Game(Dimension dim,String sf,String sm) {
 		screen = dim;
 		bounds = new Dimension(screen.width/2,screen.height/2);
 		appearField = new Dimension(256,192);
 		movementField = new Dimension(320,240);
+		
 		player = new PlayerEntity();
 		enemies = new ArrayList<EnemyEntity>();
 		bullets = new ArrayList<BulletEntity>();
+		songFolder = sf;
+		songMap = sm;
+		
+		map = new OsuBeatmap();
+		map.read(songFolder,songMap);
+		audioPlayer = JAudioPlayer.getPlayer("Songs/" + songFolder + "/" + map.AudioFilename);
 	}
 	
 	public void start() {
 		// Content
-		map = new OsuBeatmap();
-		String songFolder,songMap;
-		//songFolder = "50669 fripSide - only my railgun (TV Size)"; songMap = "fripSide - only my railgun (TV Size) (Kite) [Easy].osu";
-		//songFolder = "66221 Suzuki Konomi - DAYS of DASH"; songMap = "Suzuki Konomi - DAYS of DASH (Rotte) [A32's Hard].osu";
-		//songFolder = "43003 yanaginagi - Killer Song (Short Ver)"; songMap = "yanaginagi - Killer Song (Short Ver.) (terametis) [Insane].osu";
-		//songFolder = "41823 The Quick Brown Fox - The Big Black"; songMap = "The Quick Brown Fox - The Big Black (Blue Dragon) [WHO'S AFRAID OF THE BIG BLACK].osu";
-		//songFolder = "41823 The Quick Brown Fox - The Big Black"; songMap = "The Quick Brown Fox - The Big Black (Blue Dragon) [Ono's Taiko Oni].osu";
-		//songFolder = "41686 Lily - Scarlet Rose"; songMap = "Lily - Scarlet Rose (val0108) [0108 style].osu";
-		//songFolder = "13223 Demetori - Emotional Skyscraper ~ World's End"; songMap = "Demetori - Emotional Skyscraper ~ World's End (happy30) [Extra Stage].osu";
-		//songFolder = "43003 yanaginagi - Killer Song (Short Ver)"; songMap = "yanaginagi - Killer Song (Short Ver.) (terametis) [Noldmal].osu";
-		songFolder = "37980 An - TearVid"; songMap = "An - TearVid (Shiirn) [Another].osu";
-		map.read(songFolder,songMap);
-		audioPlayer = JAudioPlayer.getPlayer("Songs/" + songFolder + "/" + map.AudioFilename);
+		String bgFile = "";
+		background = null;
+		for (int i=0; i<map.BackgroundEvents.length && bgFile.equals(""); i++) {
+			if (map.BackgroundEvents[i].type==0) {
+				bgFile = map.BackgroundEvents[i].media;
+				try {
+					background = TextureIO.newTexture(new File("Songs/" + songFolder + "/" + bgFile),false);
+				}
+				catch (GLException e) {
+					e.printStackTrace();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		
 		// Timing
 		time = 0;
@@ -73,6 +94,16 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		long currentTime = audioPlayer.getTime();
 		EnemyEntity etemp = new EnemyEntity();
 		
+		if (background!=null) {
+			glo.glEnable(GL.GL_TEXTURE_2D);
+			background.enable();
+			background.bind();
+			glo.glColor3f(1f,1f,1f);
+			drawBox(glo,-bounds.width,bounds.height,bounds.width,-bounds.height);
+			background.disable();
+			glo.glDisable(GL.GL_TEXTURE_2D);
+		}
+		
 		glo.glBegin(GL.GL_LINE_LOOP);
 			glo.glColor3f(1f,0f,0f);
 			glo.glVertex3i(-movementField.width,movementField.height,0);
@@ -82,8 +113,6 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		glo.glEnd();
 		
 		//if (glo!=null) return;
-		// PlayerEntity
-		player.render(glo);
 		// Approaching enemies
 		int color;
 		for (int i=hitoffset; i<map.HitObjects.length && map.HitObjects[i].time<currentTime + approachSpeed; i++) {
@@ -95,6 +124,8 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 			etemp.color[2] = ((color>> 0) & 0xFF)/256f;
 			etemp.render(glo);
 		}
+		// PlayerEntity
+		player.render(glo);
 		// Enemies
 		for (Entity e : enemies) {
 			e.render(glo);
@@ -107,12 +138,7 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		// Render Information
 		float hc = (float) (Math.cos(healthAnimation*60/Math.PI)+1)/2;
 		glo.glColor3f(hc,1f,hc);
-		glo.glBegin(GL.GL_QUADS);
-			glo.glVertex2d(-bounds.width*player.health,bounds.height-32);
-			glo.glVertex2d(-bounds.width*player.health,bounds.height);
-			glo.glVertex2d(bounds.width*player.health,bounds.height);
-			glo.glVertex2d(bounds.width*player.health,bounds.height-32);
-		glo.glEnd();
+		drawBox(glo,-bounds.width*player.health,bounds.height-32,bounds.width*player.health,bounds.height-8);
 	}
 	
 	public void frame(long elapsed) {
@@ -178,6 +204,16 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		EnemyEntity newE = new EnemyEntity();
 		newE.position.set(x,y);
 		enemies.add(newE);
+	}
+	
+	// Drawing
+	private void drawBox(GL glo,double sx,double sy,double ex,double ey) {
+		glo.glBegin(GL.GL_QUADS);
+		glo.glTexCoord2d(0,0); glo.glVertex2d(sx,sy);
+		glo.glTexCoord2d(0,1); glo.glVertex2d(sx,ey);
+		glo.glTexCoord2d(1,1); glo.glVertex2d(ex,ey);
+		glo.glTexCoord2d(1,0); glo.glVertex2d(ex,sy);
+		glo.glEnd();
 	}
 
 	// Listeners
