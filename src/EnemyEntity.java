@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 
 public class EnemyEntity extends Entity {
@@ -14,23 +14,29 @@ public class EnemyEntity extends Entity {
 		pulse = 0;
 	}
 	
-	public void render(GL glo) {
+	public void render(GL2 glo) {
 		glo.glColor3f(1f,1f,1f);
-		glo.glPushMatrix();
-		glo.glTranslated(position.x,position.y,0);
-		glo.glBegin(GL.GL_POLYGON);
+		glo.glBegin(GL2.GL_TRIANGLE_FAN);
+		glo.glVertex2d(size*circleArray[0] + position.x,size*circleArray[1] + position.y);
 		for (int i=0; i<circleArray.length; i+=2) {
-			glo.glVertex2d(size*circleArray[i],size*circleArray[i+1]);
+			glo.glVertex2d(size*circleArray[i] + position.x,size*circleArray[i+1] + position.y);
 		}
 		glo.glEnd();
+		
 		glo.glColor3fv(color,0);
-		glo.glScaled(0.9,0.9,0.9);
-		glo.glBegin(GL.GL_POLYGON);
+		glo.glBegin(GL2.GL_TRIANGLE_FAN);
+		glo.glVertex2d(0.9*size*circleArray[0] + position.x,0.9*size*circleArray[1] + position.y);
 		for (int i=0; i<circleArray.length; i+=2) {
-			glo.glVertex2dv(circleArray,i);
+			glo.glVertex2d(0.9*size*circleArray[i] + position.x,0.9*size*circleArray[i+1] + position.y);
 		}
 		glo.glEnd();
-		glo.glPopMatrix();
+		
+		glo.glColor3f(0f,0f,0f);
+		glo.glBegin(GL2.GL_LINE_LOOP);
+		for (int i=0; i<circleArray.length; i+=2) {
+			glo.glVertex2d(size*circleArray[i] + position.x,size*circleArray[i+1] + position.y);
+		}
+		glo.glEnd();
 	}
 	
 	public void frame(double dt) {
@@ -41,12 +47,14 @@ public class EnemyEntity extends Entity {
 		return (position.z>0);
 	}
 	
-	public void explode(ArrayList<BulletEntity> bullets) {
+	public void explode(ArrayList<BulletEntity> bullets,double bpm) {
 		BulletEntity bt;
-		for (int i=0; i<circleArray.length; i+=2) {
+		double speed = Math.sqrt(bpm*25);
+		for (int i=0; i<circleArray.length; i+=4) {
 			bt = new BulletEntity();
 			bt.position.set(position.x + circleArray[i]*size,position.y + circleArray[i+1]*size);
-			bt.direction.set(circleArray[i]*(100),circleArray[i+1]*(100));
+			bt.direction.set(circleArray[i]*(speed),circleArray[i+1]*(speed));
+			bt.color = color;
 			bullets.add(bt);
 		}
 	}
