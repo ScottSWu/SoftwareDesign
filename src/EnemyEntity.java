@@ -41,10 +41,15 @@ public class EnemyEntity extends Entity {
 	
 	public void frame(double dt) {
 		position.z += dt;
+		pulse += dt;
 	}
 	
-	public boolean isDone() {
-		return (position.z>0);
+	public boolean isPulse(double limit) {
+		return (pulse>limit);
+	}
+	
+	public boolean isWithin(double x,double y) {
+		return (position.x-x)*(position.x-x) + (position.y-y)*(position.y-y) < size*size;
 	}
 	
 	public void explode(ArrayList<BulletEntity> bullets,double bpm) {
@@ -57,5 +62,6 @@ public class EnemyEntity extends Entity {
 			bt.color = color;
 			bullets.add(bt);
 		}
+		pulse = 0;
 	}
 }

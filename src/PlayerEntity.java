@@ -10,6 +10,8 @@ public class PlayerEntity extends Entity {
 	public double
 		direction = 0,
 		moveDirection = 0,
+		shootDirection = 0,
+		shoot = 0,
 		flash = 0,
 		health = 1;
 	public int hits = 0;
@@ -18,6 +20,7 @@ public class PlayerEntity extends Entity {
 		movedRight = false,
 		movedUp = false,
 		movedDown = false;
+	public boolean shooting = false;
 	
 	public PlayerEntity() {
 		super();
@@ -33,7 +36,10 @@ public class PlayerEntity extends Entity {
 		}
 		glo.glPushMatrix();
 		glo.glTranslated(position.x,position.y,0);
+		glo.glPushMatrix();
 		glo.glRotated(direction,0,0,1);
+		
+		// Player
 		glo.glBegin(GL2.GL_TRIANGLE_STRIP);
 			glo.glColor3f(0f,0.5f,1f);
 			glo.glVertex2d(-8,-6);
@@ -44,6 +50,8 @@ public class PlayerEntity extends Entity {
 			glo.glColor3f(0f,0.5f,1f);
 			glo.glVertex2d(8,-6);
 		glo.glEnd();
+		
+		// Hit point
 		glo.glColor3f(1f,1f,1f);
 		glo.glBegin(GL2.GL_QUADS);
 			glo.glVertex2d(-1,-1);
@@ -52,11 +60,51 @@ public class PlayerEntity extends Entity {
 			glo.glVertex2d( 1,-1);
 		glo.glEnd();
 		glo.glPopMatrix();
+		
+		glo.glRotated(shootDirection,0,0,1);
+		// Laser
+		if (shoot>0) {
+			double cx = position.x-Configuration.mousePosition.x;
+			double cy = position.y-Configuration.mousePosition.y;
+			double laserDistance = Math.sqrt(cx*cx + cy*cy) - 8;
+			float laserColor = (float) shoot/0.25f;
+			if (laserColor>1f) laserColor = 0f; else laserColor = 1f - laserColor;
+			glo.glBegin(GL2.GL_QUADS);
+				glo.glColor4f(laserColor,laserColor,1f,1f);
+				glo.glVertex2d(-1,8);
+				glo.glVertex2d( 1,8);
+				glo.glColor4f(laserColor,laserColor,1f,0.2f);
+				glo.glVertex2d( 1,laserDistance/2);
+				glo.glVertex2d(-1,laserDistance/2);
+				
+				glo.glVertex2d(-1,laserDistance/2);
+				glo.glVertex2d( 1,laserDistance/2);
+				glo.glColor4f(laserColor,laserColor,1f,1f);
+				glo.glVertex2d( 1,laserDistance);
+				glo.glVertex2d(-1,laserDistance);
+			glo.glEnd();
+		}
+		
+		glo.glPopMatrix();
+		glo.glPopMatrix();
 	}
 	
 	public void frame(double elapsed) {
+		// Hit flash
 		if (flash>0) {
 			flash -= elapsed;
+		}
+		
+		// Health
+		health += elapsed/25;
+		if (health>1) health = 1;
+		
+		// Shooting
+		if (shooting) {
+			shoot += elapsed;
+		}
+		else {
+			shoot = 0;
 		}
 		
 		int m1,m2;
@@ -70,12 +118,10 @@ public class PlayerEntity extends Entity {
 		movedUp = false;
 		movedDown = false;
 		
-		health += elapsed/25;
-		if (health>1) health = 1;
 		double dirDiff = moveDirection-direction;
 		if (dirDiff<-180) dirDiff += 360;
 		if (dirDiff>180) dirDiff -= 360;
-		//System.out.println(moveDirection + " " + direction + " " + dirDiff);
+		
 		if (dirDiff<-1) {
 			direction -= elapsed*900;
 			
@@ -86,6 +132,8 @@ public class PlayerEntity extends Entity {
 		}
 		if (direction<-180) direction += 360;
 		if (direction>180) direction -= 360;
+		
+		shootDirection = Math.atan2(Configuration.mousePosition.y - position.y,Configuration.mousePosition.x - position.x)/Math.PI*180 - 90;
 	}
 	
 	public void hit() {

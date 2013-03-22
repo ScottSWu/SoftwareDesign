@@ -1,4 +1,5 @@
 import java.awt.Dimension;
+import java.awt.MouseInfo;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -19,8 +20,10 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	
 	// Game variables
 	public long time;
+	public int[] mouse = new int[5];
 	public boolean[] keys = new boolean[256];
 	private String songFolder,songMap;
+	private OsuBeatmap map;
 	private PlayerEntity player;
 	private ArrayList<EnemyEntity> enemies;
 	private ArrayList<BulletEntity> bullets;
@@ -30,9 +33,9 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	private ImageTexture inputDisplay;
 	
 	// Prototype test
-	private OsuBeatmap map;
+	private boolean started;
 	private JAudioPlayer audioPlayer;
-	private boolean audioPlaying;
+	private boolean paused;
 	private int hitoffset;
 	private int timingoffset;
 	private long approachSpeed = 800;
@@ -62,6 +65,8 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		audioPlayer = JAudioPlayer.getPlayer("Songs/" + songFolder + "/" + map.AudioFilename);
 		inputDisplay = new ImageTexture("images/keyInput.png");
 		
+		score = 0;
+		
 		// Content textures
 		try {
 			String bgFile = "";
@@ -85,18 +90,23 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		time = -map.AudioLeadIn;
 		hitoffset = 0;
 		timingoffset = 0;
-		audioPlaying = false;
 		audioPlayer.start();
 		audioPlayer.pause();
-		//paused = true;
+		audioPlayer.setVolumeGain(-15f);
+		paused = false;
+		started = true;
 		
 		// Animations
 		healthAnimation = 0;
 	}
 	
 	public void stop() {
-		audioPlaying = false;
+		started = false;
 		audioPlayer.stop();
+	}
+	
+	public boolean isStarted() {
+		return started;
 	}
 	
 	public void render(GL2 glo) {
@@ -137,6 +147,7 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		glo.glColor4f(0f,0f,0f,vs); glo.glVertex2i(movementField.width,-movementField.height);
 		glo.glEnd();
 		
+		/*
 		glo.glBegin(GL2.GL_LINE_LOOP);
 			glo.glColor3f(1f,0f,0f);
 			glo.glVertex2i(-movementField.width,movementField.height);
@@ -144,12 +155,12 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 			glo.glVertex2i(movementField.width,-movementField.height);
 			glo.glVertex2i(-movementField.width,-movementField.height);
 		glo.glEnd();
+		*/
 		
 		//if (glo!=null) return;
 		// Approaching enemies
 		// TODO Need to invert, add to enemies list and let hitoffset be the end of the scan.
 		int color;
-		System.out.println(currentTime);
 		for (int i=hitoffset; i<map.HitObjects.length && map.HitObjects[i].time<currentTime + approachSpeed; i++) {
 			etemp.position.set(map.HitObjects[i].x - appearField.width,appearField.height - map.HitObjects[i].y);
 			etemp.size = hitSize * (1.0 - (double) (map.HitObjects[i].time-currentTime)/approachSpeed);
@@ -159,12 +170,12 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 			etemp.color[2] = ((color>> 0) & 0xFF)/256f;
 			etemp.render(glo);
 		}
-		// PlayerEntity
-		player.render(glo);
 		// Enemies
 		for (Entity e : enemies) {
 			e.render(glo);
 		}
+		// Player
+		player.render(glo);
 		// Bullets
 		for (Entity e : bullets) {
 			e.render(glo);
@@ -181,66 +192,73 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		inputDisplay.texture.bind(glo);
 		
 		glo.glColor3f(1f,1f,1f); if (keys[KeyEvent.VK_SHIFT]) glo.glColor3f(1f,0f,0f);
-		drawBoxPortion(glo,
-					-movementField.width,-Configuration.bounds.height,-movementField.width+60,-Configuration.bounds.height+30,
-					0,80,80,40,640,80);
+		drawBoxPortion(glo,-movementField.width,	-Configuration.bounds.height,	-movementField.width+60,	-Configuration.bounds.height+30,0,80,80,40,640,80);
 		glo.glColor3f(1f,1f,1f); if (keys[KeyEvent.VK_W] || keys[KeyEvent.VK_UP]) glo.glColor3f(1f,0f,0f);
-		drawBoxPortion(glo,
-					-movementField.width+90,-Configuration.bounds.height+30,-movementField.width+120,-Configuration.bounds.height+60,
-					120,40,160,0,640,80);
+		drawBoxPortion(glo,-movementField.width+90,	-Configuration.bounds.height+30,-movementField.width+120,	-Configuration.bounds.height+60,120,40,160,0,640,80);
 		glo.glColor3f(1f,1f,1f); if (keys[KeyEvent.VK_A] || keys[KeyEvent.VK_LEFT]) glo.glColor3f(1f,0f,0f);
-		drawBoxPortion(glo,
-					-movementField.width+60,-Configuration.bounds.height,-movementField.width+90,-Configuration.bounds.height+30,
-					80,80,120,40,640,80);
+		drawBoxPortion(glo,-movementField.width+60,	-Configuration.bounds.height,	-movementField.width+90,	-Configuration.bounds.height+30,80,80,120,40,640,80);
 		glo.glColor3f(1f,1f,1f); if (keys[KeyEvent.VK_S] || keys[KeyEvent.VK_DOWN]) glo.glColor3f(1f,0f,0f);
-		drawBoxPortion(glo,
-					-movementField.width+90,-Configuration.bounds.height,-movementField.width+120,-Configuration.bounds.height+30,
-					120,80,160,40,640,80);
+		drawBoxPortion(glo,-movementField.width+90,	-Configuration.bounds.height,	-movementField.width+120,	-Configuration.bounds.height+30,120,80,160,40,640,80);
 		glo.glColor3f(1f,1f,1f); if (keys[KeyEvent.VK_D] || keys[KeyEvent.VK_RIGHT]) glo.glColor3f(1f,0f,0f);
-		drawBoxPortion(glo,
-					-movementField.width+120,-Configuration.bounds.height,-movementField.width+150,-Configuration.bounds.height+30,
-					160,80,200,40,640,80);
+		drawBoxPortion(glo,-movementField.width+120,-Configuration.bounds.height,	-movementField.width+150,	-Configuration.bounds.height+30,160,80,200,40,640,80);
+		glo.glColor3f(1f,1f,1f); if (keys[KeyEvent.VK_SPACE]) glo.glColor3f(1f,0f,0f);
+		drawBoxPortion(glo,-movementField.width+150,-Configuration.bounds.height,	-movementField.width+240,	-Configuration.bounds.height+30,200,80,320,40,640,80);
+		glo.glColor3f(1f,1f,1f); if ((mouse[0]&1)==1 || (mouse[0]&2)==2) glo.glColor3f(1f,0f,0f);
+		drawBoxPortion(glo,-movementField.width+240,-Configuration.bounds.height,	-movementField.width+270,	-Configuration.bounds.height+30,320,80,360,40,640,80);
+		glo.glColor3f(1f,1f,1f); if ((mouse[0]&4)==4) glo.glColor3f(1f,0f,0f);
+		drawBoxPortion(glo,-movementField.width+270,-Configuration.bounds.height,	-movementField.width+300,	-Configuration.bounds.height+30,360,80,400,40,640,80);
 			
 		inputDisplay.texture.disable(glo);
 		glo.glDisable(GL2.GL_TEXTURE_2D);
+		
+		Configuration.gltr.beginRendering(Configuration.screen.width,Configuration.screen.height);
+		Configuration.gltr.setColor(1f,1f,1f,1f);
+		Configuration.gltr.draw(String.valueOf(score),Configuration.screen.width-160,0);
+		Configuration.gltr.endRendering();
 	}
 	
 	public void frame(long elapsed) {
-		long currentTime;
-		if (audioPlaying) {
-			currentTime = audioPlayer.getTime();
-			time = currentTime;
-		}
-		else {
-			currentTime = time;
-			time += elapsed/1000000;
-			if (time>0) {
+		long currentTime = time;
+		if (audioPlayer==null) return;
+		if (!paused) {
+			if (!audioPlayer.isPaused()) {
+				currentTime = audioPlayer.getTime();
+				time = currentTime;
+			}
+			else if (time<0 && !paused) {
+				time += elapsed/1000000;
+				if (time>=0) {
+					audioPlayer.resume();
+				}
+			}
+			else if (time>=0 && !paused && audioPlayer.isPaused()) {
 				audioPlayer.resume();
-				audioPlaying = true;
 			}
 		}
 		double dt = elapsed/1000000000.0;
-		//System.out.println(currentTime + "\t" + dt + "\t" + enemies.size() + "\t" + bullets.size() + "\t" + player.hits);
+		System.out.println(currentTime + "\t" + dt + "\t" + paused + "\t" + audioPlayer.isPaused());
 		if (paused) return;
 		
 		// Keypresses
 		double moveScale = 100;
 		if (keys[KeyEvent.VK_SHIFT]) { moveScale = 250; }
-		if (keys[KeyEvent.VK_UP] || keys[KeyEvent.VK_W]) { player.moveUp(moveScale*dt); }
-		if (keys[KeyEvent.VK_LEFT] || keys[KeyEvent.VK_A]) { player.moveLeft(moveScale*dt); }
-		if (keys[KeyEvent.VK_DOWN] || keys[KeyEvent.VK_S]) { player.moveDown(moveScale*dt); }
+		if (keys[KeyEvent.VK_UP]    || keys[KeyEvent.VK_W]) { player.moveUp(moveScale*dt); }
+		if (keys[KeyEvent.VK_LEFT]  || keys[KeyEvent.VK_A]) { player.moveLeft(moveScale*dt); }
+		if (keys[KeyEvent.VK_DOWN]  || keys[KeyEvent.VK_S]) { player.moveDown(moveScale*dt); }
 		if (keys[KeyEvent.VK_RIGHT] || keys[KeyEvent.VK_D]) { player.moveRight(moveScale*dt); }
 		
-		if (player.position.x<-movementField.width) player.position.x = -movementField.width;
-		if (player.position.x> movementField.width) player.position.x = movementField.width;
+		if (player.position.x<-movementField.width)  player.position.x = -movementField.width;
+		if (player.position.x> movementField.width)  player.position.x = movementField.width;
 		if (player.position.y<-movementField.height) player.position.y = -movementField.height;
 		if (player.position.y> movementField.height) player.position.y = movementField.height;
 		
 		// Update
 		// Player
+		if (mouse[0]==0) player.shooting = false;
+		else player.shooting = true;
 		player.frame(dt);
 		
-		// New Enemies
+		// Map variables
 		EnemyEntity etemp;
 		if (hitoffset<map.HitObjects.length && currentTime>map.HitObjects[hitoffset].time) {
 			etemp = new EnemyEntity();
@@ -251,17 +269,27 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 			etemp.color[1] = ((color>> 8) & 0xFF)/256f;
 			etemp.color[2] = ((color>> 0) & 0xFF)/256f;
 			enemies.add(etemp);
+			etemp.explode(bullets,map.TimingPoints[timingoffset].bpm);
 			hitoffset++;
 		}
 		if (currentTime>map.TimingPoints[timingoffset].time && timingoffset<map.TimingPoints.length-1) {
 			timingoffset++;
 		}
 		
+		double mspb = 60.0/map.TimingPoints[timingoffset].bpm*map.TimingPoints[timingoffset].meter;
+		
 		// Render entities
+		int addscore;
 		for (int i=0; i<enemies.size(); i++) {
 			enemies.get(i).frame(dt);
-			if (enemies.get(i).isDone()) {
+			if (enemies.get(i).isPulse(mspb)) {
 				enemies.get(i).explode(bullets,map.TimingPoints[timingoffset].bpm);
+				//enemies.remove(i--);
+			}
+			if (mouse[0]>0 && enemies.get(i).isWithin(Configuration.mousePosition.x,Configuration.mousePosition.y)) {
+				addscore = (int) (100 - player.shoot*50);
+				if (addscore<0) addscore = 0;
+				score += addscore;
 				enemies.remove(i--);
 			}
 		}
@@ -293,10 +321,10 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	
 	protected void drawBoxPortion(GL2 glo,double sx,double sy,double ex,double ey,double su,double sv,double eu,double ev) {
 		glo.glBegin(GL2.GL_QUADS);
-		glo.glTexCoord2d(su,1-sv); glo.glVertex2d(sx,sy);
-		glo.glTexCoord2d(su,1-ev); glo.glVertex2d(sx,ey);
-		glo.glTexCoord2d(eu,1-ev); glo.glVertex2d(ex,ey);
-		glo.glTexCoord2d(eu,1-sv); glo.glVertex2d(ex,sy);
+		glo.glTexCoord2d(su,sv); glo.glVertex2d(sx,sy);
+		glo.glTexCoord2d(su,ev); glo.glVertex2d(sx,ey);
+		glo.glTexCoord2d(eu,ev); glo.glVertex2d(ex,ey);
+		glo.glTexCoord2d(eu,sv); glo.glVertex2d(ex,sy);
 		glo.glEnd();
 	}
 	
@@ -311,9 +339,8 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	}
 
 	// Listeners
-	private boolean paused = false;
 	public void handleKeyEvent(KeyEvent arg0) {
-		if (arg0.getKeyCode()==KeyEvent.VK_P) {
+		if (arg0.getID()==KeyEvent.KEY_PRESSED && arg0.getKeyCode()==KeyEvent.VK_P) {
 			System.out.println("Paused");
 			if (!paused) {
 				paused = true;
@@ -331,7 +358,20 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	}
 	
 	public void handleMouseEvent(MouseEvent arg0) {
-		
+		int cmouse = mouse[0];
+		if (arg0.getID()==MouseEvent.MOUSE_PRESSED) {
+			if (arg0.getButton()==MouseEvent.BUTTON1) mouse[0] |= 1;
+			if (arg0.getButton()==MouseEvent.BUTTON2) mouse[0] |= 2;
+			if (arg0.getButton()==MouseEvent.BUTTON3) mouse[0] |= 4;
+			if (cmouse!=mouse[0]) { // Mouse state changed
+				player.shoot = 0;
+			}
+		}
+		else if (arg0.getID()==MouseEvent.MOUSE_RELEASED) {
+			if (arg0.getButton()==MouseEvent.BUTTON1) mouse[0] &= ~1;
+			if (arg0.getButton()==MouseEvent.BUTTON2) mouse[0] &= ~2;
+			if (arg0.getButton()==MouseEvent.BUTTON3) mouse[0] &= ~4;
+		}
 	}
 	
 	// Listener interface methods

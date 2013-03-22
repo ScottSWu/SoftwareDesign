@@ -1,347 +1,255 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import com.jogamp.opengl.util.FPSAnimator;
+import funnytrees.JOsu.OsuData.OsuBeatmap;
 
-public class SwingMain{
-	public static JPanel cards;
-	public static CardLayout cl;
-	public static JPanel mainMenu;
-	public static JPanel playMenu;
-	public static JPanel instructions;
-	public static JPanel optionsMenu;
-	public static GridBagConstraints c;
-	public static boolean upBool = false;
-	public static boolean leftBool = false;
-	public static boolean downBool = false;
-	public static boolean rightBool = false;
+public class SwingMain implements ActionListener,KeyListener {
+	// Options
+	private boolean FULLSCREEN = false;
+	private int WIDTH = 800;
+	private int HEIGHT = 600;
+	
+	// Variables
+	private Dimension screenSize;
+	private FPSAnimator animator;
+	private JFrame window;
+	private JPanel cards;
+	private CardLayout deck;
+	private JPanel mainMenu;
+	private JPanel playMenu;
+	private JPanel instructions;
+	private JPanel optionsMenu;
+	private RenderCanvas canvas;
 	
 	public static void main(String[] args){
-		try {
-			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (InstantiationException e1) {
-			e1.printStackTrace();
-		} catch (IllegalAccessException e1) {
-			e1.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e1) {
-			e1.printStackTrace();
-		}
+		new SwingMain("SwingMain");
+	}
+	
+	public SwingMain(String title) {
 		
-		JFrame frame = new JFrame();
+		window = new JFrame(title);
+		window.setBackground(Color.WHITE);
+		
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		if (FULLSCREEN) {
+			screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			window.setResizable(false);
+			window.setUndecorated(true);
+			window.setSize(screenSize);
+		}
+		else {
+			screenSize = new Dimension(WIDTH,HEIGHT);
+			window.setSize(screenSize);
+			window.setVisible(true);
+			Dimension actualSize = window.getContentPane().getSize();
+			Dimension adjustedSize = new Dimension(2*screenSize.width - actualSize.width,2*screenSize.height - actualSize.height);
+			window.setSize(adjustedSize);
+			window.setVisible(false);
+		}
+		canvas = new RenderCanvas(window,screenSize);
+		animator = new FPSAnimator(canvas,120);
+		
 		createMain();
 		createPlay();
 		createInstructions();
 		createOptions();
 		createCards();
-		frame.add(cards);
 		
-		frame.setSize(500, 500);
-		frame.setVisible(true);
-		frame.addWindowListener(new WindowAdapter(){
-			public void windowClosing(WindowEvent e){
-				System.exit(0);
-			}
-		});
+		cards.setBackground(Color.BLUE);
+		window.add(cards);
+		deck.show(cards,"mainMenu");
+		window.setVisible(true);
 	}
 	
 	//creates main menu panel
-	public static void createMain(){
+	public void createMain() {
 		mainMenu = new JPanel();
+		mainMenu.setSize(screenSize);
+		mainMenu.setBackground(Color.WHITE);
 		mainMenu.setLayout(new GridBagLayout());
 		
-		c = new GridBagConstraints();
-		c.gridy = 0;
+		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
-		JButton play = new JButton("Play");
-		play.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				cl.show(cards, "play");
-			}
-		});
+		
+		c.gridy = 0;
+		MenuButton play = new MenuButton("Play","playMenu");
+		play.addActionListener(this);
 		mainMenu.add(play, c);
 		
-		c = new GridBagConstraints();
 		c.gridy = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		JButton instructions = new JButton("Instructions");
-		instructions.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				cl.show(cards, "inst");
-			}
-		});
+		MenuButton instructions = new MenuButton("Instructions","instructionMenu");
+		instructions.addActionListener(this);
 		mainMenu.add(instructions, c);
 		
-		c = new GridBagConstraints();
 		c.gridy = 2;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		JButton options = new JButton("Options");
-		options.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				cl.show(cards, "optn");
-			}
-		});
+		MenuButton options = new MenuButton("Options","optionMenu");
+		options.addActionListener(this);
 		mainMenu.add(options, c);
 		
-		c = new GridBagConstraints();
 		c.gridy = 3;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		JButton quit = new JButton("Quit");
-		quit.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				System.exit(0);
-			}
-		});
-		mainMenu.add(quit, c);
+		MenuButton quit = new MenuButton("Quit","quitMenu");
+		quit.addActionListener(this);
+		mainMenu.add(quit,c);
 	}
 	
 	//creates play menu panel
-	public static void createPlay(){
+	public void createPlay() {
 		playMenu = new JPanel();
-		playMenu.setLayout(new GridBagLayout());
+		playMenu.setSize(screenSize);
+		playMenu.setLayout(new BoxLayout(playMenu,BoxLayout.Y_AXIS));
+		JPanel scrollableSelections = new JPanel();
+		scrollableSelections.setLayout(new BoxLayout(scrollableSelections,BoxLayout.Y_AXIS));
+		JScrollPane selections = new JScrollPane(scrollableSelections,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		File[] songs = (new File("Songs")).listFiles(),songParts;
+		ArrayList<OsuBeatmap> maps = new ArrayList<OsuBeatmap>();
+		OsuBeatmap map;
+		SongButton songSelection;
+		String buttonText;
 		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		ImageIcon img1 = new ImageIcon("img1.jpg");
-		JButton test = new JButton("Emotional Skyscraper - Demetori", img1);
-		test.setVerticalTextPosition(AbstractButton.BOTTOM);
-		test.setHorizontalTextPosition(AbstractButton.CENTER);
-		playMenu.add(test, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 1;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		ImageIcon img2 = new ImageIcon("img2.jpg");
-		JButton test2 = new JButton("TearVid - An", img2);
-		test2.setVerticalTextPosition(AbstractButton.BOTTOM);
-		test2.setHorizontalTextPosition(AbstractButton.CENTER);
-		playMenu.add(test2, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 2;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		ImageIcon img3 = new ImageIcon("img3.jpg");
-		JButton test3 = new JButton("Scarlet Rose - Lily", img3);
-		test3.setVerticalTextPosition(AbstractButton.BOTTOM);
-		test3.setHorizontalTextPosition(AbstractButton.CENTER);
-		playMenu.add(test3, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		ImageIcon img4 = new ImageIcon("img4.png");
-		JButton test4 = new JButton("The Big Black - The Quick Brown Fox", img4);
-		test4.setVerticalTextPosition(AbstractButton.BOTTOM);
-		test4.setHorizontalTextPosition(AbstractButton.CENTER);
-		playMenu.add(test4, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 1;
-		c.gridy = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		ImageIcon img5 = new ImageIcon("img5.jpg");
-		JButton test5 = new JButton("Killer Song - Yanaginagi", img5);
-		test5.setVerticalTextPosition(AbstractButton.BOTTOM);
-		test5.setHorizontalTextPosition(AbstractButton.CENTER);
-		playMenu.add(test5, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 2;
-		c.gridy = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		ImageIcon img6 = new ImageIcon("img6.jpg");
-		JButton test6 = new JButton("Only My Railgun - FripSide", img6);
-		test6.setVerticalTextPosition(AbstractButton.BOTTOM);
-		test6.setHorizontalTextPosition(AbstractButton.CENTER);
-		playMenu.add(test6, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 2;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		ImageIcon img7 = new ImageIcon("img7.jpg");
-		JButton test7 = new JButton("Days of Dash - Suzuki Konomi", img7);
-		test7.setVerticalTextPosition(AbstractButton.BOTTOM);
-		test7.setHorizontalTextPosition(AbstractButton.CENTER);
-		playMenu.add(test7, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 3;
-		c.gridwidth = 3;
-		JButton back = new JButton("Back");
-		back.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				cl.show(cards, "main");
-				((SongButton) e.getSource()).getaopsidjf();
+		MenuButton back = new MenuButton("Back","mainMenu");
+		back.addActionListener(this);
+		playMenu.add(back);
+		for (int i=0; i<songs.length; i++) {
+			if (songs[i].isDirectory()) {
+				songParts = songs[i].listFiles();
+				for (int j=0; j<songParts.length; j++) {
+					if (songParts[j].getName().endsWith(".osu")) {
+						map = new OsuBeatmap();
+						map.readMeta(songs[i].getName(),songParts[j].getName());
+						maps.add(map);
+						buttonText = "(Difficulty " + map.OverallDifficulty + ") " + map.Artist + " - " + map.Title + " [" + map.Version + "]";
+						songSelection = new SongButton(buttonText,songs[i].getName(),songParts[j].getName());
+						songSelection.addActionListener(this);
+						scrollableSelections.add(songSelection);
+					}
+				}
 			}
-		});
-		playMenu.add(back, c);
+		}
+		playMenu.add(selections);
 	}
 	
 	//creates instructions panel
-	public static void createInstructions(){
-		instructions = new JPanel();
-		instructions.setLayout(new BoxLayout(instructions, BoxLayout.PAGE_AXIS));
+	private int currentPage = 0;
+	public void createInstructions() {
+		instructions = new JPanel() {
+			private int totalPages = 3;
+			private BufferedImage[] pages = new BufferedImage[totalPages];
+			
+			public void paint(Graphics g) {
+				if (currentPage>=totalPages) currentPage = currentPage - totalPages;
+				if (currentPage<0) currentPage = currentPage + totalPages;
+				if (pages[currentPage]==null) loadImage(currentPage);
+				g.drawImage(pages[currentPage],0,0,null);
+				for (int i=0; i<this.getComponentCount(); i++) {
+					this.getComponent(i).paint(g);
+				}
+			}
+			
+			private void loadImage(int i) {
+				try {
+					pages[i] = ImageIO.read(new File("images/instructions" + i + ".png"));
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		instructions.setSize(screenSize);
+		instructions.setBackground(Color.WHITE);
+		instructions.setLayout(new BoxLayout(instructions,BoxLayout.PAGE_AXIS));
 		
-		JLabel hi = new JLabel("Instructions");
-		instructions.add(hi);
-		
-		JLabel hi2 = new JLabel("Objective");
-		instructions.add(hi2);
-		
-		JLabel hi3 = new JLabel("The objective of the game is to complete a song while avoiding as many bullets and enemies as possible.");
-		instructions.add(hi3);
-		
-		JLabel hi4 = new JLabel("Controls");
-		instructions.add(hi4);
-		
-		JLabel hi5 = new JLabel("Use the WASD keys to navigate around the screen and the mouse to aim. Left click to shoot.");
-		instructions.add(hi5);
-		
-		JButton back = new JButton("Back");
-		back.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				cl.show(cards, "main");
+		MenuButton back = new MenuButton("Back","mainMenu");
+		back.addActionListener(this);
+		instructions.add(back);
+		back.setLocation(0,0);
+		instructions.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getX()>720 && e.getY()>150 && e.getY()<450) {
+					currentPage++;
+					instructions.repaint();
+				}
+				else if (e.getX()<80 && e.getY()>150 && e.getY()<450) {
+					currentPage--;
+					instructions.repaint();
+				}
 			}
 		});
-		instructions.add(back);
 	}
 	
 	//creates options menu panel
-	public static void createOptions(){
-		
+	public void createOptions() {
 		optionsMenu = new JPanel();
+		optionsMenu.setSize(screenSize);
+		optionsMenu.setBackground(Color.WHITE);
 		optionsMenu.setLayout(new GridBagLayout());
 		
-		c = new GridBagConstraints();
+		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 3;
 		JLabel options = new JLabel("Options");
 		optionsMenu.add(options, c);
 		
-		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 2;
 		JLabel controls = new JLabel("Controls");
 		optionsMenu.add(controls, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 0;
 		c.gridy = 2;
-		c.gridwidth = 2;
 		JLabel movement = new JLabel("Movement");
 		optionsMenu.add(movement, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 0;
 		c.gridy = 3;
+		c.gridwidth = 1;
 		JLabel up = new JLabel("Up");
 		optionsMenu.add(up, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 0;
 		c.gridy = 4;
 		JLabel left = new JLabel("Left");
 		optionsMenu.add(left, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 0;
 		c.gridy = 5;
 		JLabel down = new JLabel("Down");
 		optionsMenu.add(down, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 0;
 		c.gridy = 6;
 		JLabel right = new JLabel("Right");
 		optionsMenu.add(right, c);
 		
-		c = new GridBagConstraints();
 		c.gridx = 1;
 		c.gridy = 3;
 		JButton upB = new JButton("W");
-		upB.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				upBool = true;
-				leftBool = false;
-				downBool = false;
-				rightBool = false;
-			}
-		});
-//		upB.addKeyListener(new KeyAdapter(){
-//			public void keyPressed(KeyEvent e){
-//				if (upBool && e.getKeyCode() == KeyEvent.VK_CONTROL){
-//					Character upChar = e.getKeyChar();
-//				}
-//			}
-//		});
 		optionsMenu.add(upB, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 1;
 		c.gridy = 4;
 		JButton leftB = new JButton("A");
-		leftB.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				upBool = false;
-				leftBool = true;
-				downBool = false;
-				rightBool = false;
-			}
-		});
 		optionsMenu.add(leftB, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 1;
 		c.gridy = 5;
 		JButton downB = new JButton("S");
-		downB.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				upBool = false;
-				leftBool = false;
-				downBool = true;
-				rightBool = false;
-			}
-		});
 		optionsMenu.add(downB, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 1;
 		c.gridy = 6;
 		JButton rightB = new JButton("D");
-		rightB.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				upBool = false;
-				leftBool = false;
-				downBool = false;
-				rightBool = true;
-			}
-		});
 		optionsMenu.add(rightB, c);
 		
-		c = new GridBagConstraints();
 		c.gridx = 2;
 		c.gridy = 1;
 		JLabel audio = new JLabel("Audio");
 		optionsMenu.add(audio, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 2;
 		c.gridy = 2;
 		JLabel masterVol = new JLabel("Master Volume");
 		optionsMenu.add(masterVol, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 2;
 		c.gridy = 3;
 		JSlider mvSlider = new JSlider(0, 100, 50);
 		mvSlider.setMajorTickSpacing(50);
@@ -350,14 +258,10 @@ public class SwingMain{
 		mvSlider.setPaintTicks(true);
 		optionsMenu.add(mvSlider, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 2;
 		c.gridy = 4;
 		JLabel music = new JLabel("Music");
 		optionsMenu.add(music, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 2;
 		c.gridy = 5;
 		JSlider mSlider = new JSlider(0, 100, 50);
 		mSlider.setMajorTickSpacing(50);
@@ -366,14 +270,10 @@ public class SwingMain{
 		mSlider.setPaintTicks(true);
 		optionsMenu.add(mSlider, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 2;
 		c.gridy = 6;
 		JLabel soundEff = new JLabel("Sound Effects");
 		optionsMenu.add(soundEff, c);
 		
-		c = new GridBagConstraints();
-		c.gridx = 2;
 		c.gridy = 7;
 		JSlider seSlider = new JSlider(0, 100, 50);
 		seSlider.setMajorTickSpacing(50);
@@ -382,25 +282,56 @@ public class SwingMain{
 		seSlider.setPaintTicks(true);
 		optionsMenu.add(seSlider, c);
 		
-		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 8;
 		c.gridwidth = 3;
-		JButton back = new JButton("Back");
-		back.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				cl.show(cards, "main");
-			}
-		});
+		MenuButton back = new MenuButton("Back","mainMenu");
+		back.addActionListener(this);
 		optionsMenu.add(back, c);
 	}
 	
-	public static void createCards(){
-		cards = new JPanel(new CardLayout());
-		cards.add(mainMenu, "main");
-		cards.add(playMenu, "play");
-		cards.add(instructions, "inst");
-		cards.add(optionsMenu, "optn");
-		cl = (CardLayout)(cards.getLayout());
+	public void createCards() {
+		deck = new CardLayout();
+		cards = new JPanel(deck);
+		cards.setSize(screenSize);
+		
+		cards.add(mainMenu,"mainMenu");
+		cards.add(playMenu,"playMenu");
+		cards.add(canvas,"game");
+		cards.add(instructions,"instructionMenu");
+		cards.add(optionsMenu,"optionMenu");
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() instanceof MenuButton) {
+			MenuButton place = ((MenuButton) e.getSource());
+			if (place.target.equals("quitMenu")) System.exit(0);
+			deck.show(cards,place.target);
+		}
+		else if (e.getSource() instanceof SongButton) {
+			SongButton song = ((SongButton) e.getSource());
+			canvas.loadGame(song.songFolder,song.songMap);
+			deck.show(cards,"game");
+			canvas.startGame();
+			animator.start();
+		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

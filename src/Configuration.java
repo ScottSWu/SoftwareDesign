@@ -1,18 +1,25 @@
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import javax.media.opengl.GLProfile;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 
 public class Configuration {
-	public static final int PLACE_MENU = 1;
-	public static final int PLACE_OPTIONS = 11;
-	public static final int PLACE_SELECT = 21;
-	public static final int PLACE_INSTRUCTION = 31;
-	public static final int PLACE_GAME = 101;
-	public static final int PLACE_EXIT = -1;
+	public static Dimension screen =  new Dimension();
+	public static Dimension bounds =  new Dimension();
+	public static Dimension screenOffset =  new Dimension();
+	public static Point mousePosition =  new Point();
+	public static Cursor hiddenCursor;
+	public static final GLProfile GLP = GLProfile.getDefault();
+	public static TextRenderer gltr = new TextRenderer(new Font("Arial",Font.BOLD,24));
 	
-	public static Dimension screen;
-	public static Dimension bounds;
-	public static void setConfiguration(Dimension dim) {
-		screen = new Dimension(dim.width,dim.height);
-		bounds = new Dimension(dim.width/2,dim.height/2);
+	public static float audioVolume = 0f;
+	
+	static {
+		hiddenCursor = Toolkit.getDefaultToolkit().createCustomCursor(new BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR),new Point(0,0),"hidden");
 	}
 }

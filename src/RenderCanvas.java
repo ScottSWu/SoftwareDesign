@@ -1,37 +1,53 @@
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 public class RenderCanvas extends GLCanvas implements GLEventListener {
 	private GLU gluo;
 	public Game game;
+	private ImageTexture cursor;
+	private Container parent;
+	private boolean startRequest = false;
+	private TextRenderer gltr;
 	
-	public RenderCanvas(Dimension dim) {
+	public RenderCanvas(Container p,Dimension dim) {
 		this.addGLEventListener(this);
 		this.setSize(dim);
-		Configuration.setConfiguration(dim);
-		
-		String songFolder,songMap;
-		//songFolder = "50669 fripSide - only my railgun (TV Size)"; songMap = "fripSide - only my railgun (TV Size) (Kite) [Easy].osu";
-		//songFolder = "66221 Suzuki Konomi - DAYS of DASH"; songMap = "Suzuki Konomi - DAYS of DASH (Rotte) [A32's Hard].osu";
-		//songFolder = "43003 yanaginagi - Killer Song (Short Ver)"; songMap = "yanaginagi - Killer Song (Short Ver.) (terametis) [Insane].osu";
-		//songFolder = "41823 The Quick Brown Fox - The Big Black"; songMap = "The Quick Brown Fox - The Big Black (Blue Dragon) [WHO'S AFRAID OF THE BIG BLACK].osu";
-		//songFolder = "41686 Lily - Scarlet Rose"; songMap = "Lily - Scarlet Rose (val0108) [0108 style].osu";
-		//songFolder = "13223 Demetori - Emotional Skyscraper ~ World's End"; songMap = "Demetori - Emotional Skyscraper ~ World's End (happy30) [Extra Stage].osu";
-		//songFolder = "43003 yanaginagi - Killer Song (Short Ver)"; songMap = "yanaginagi - Killer Song (Short Ver.) (terametis) [Nloldmal].osu";
-		songFolder = "37980 An - TearVid"; songMap = "An - TearVid (Shiirn) [Another].osu";
-		//songFolder = "31373 SHIKI - BABYLON"; songMap = "SHIKI - BABYLON (miccoliasms) [Another].osu";
-		//songFolder = "45074 Black Hole - Pluto"; songMap = "Black Hole - Pluto (7odoa) [Expert].osu";
-		
-		game = new Game();
-		game.setMap(songFolder,songMap);
+		Configuration.screen = new Dimension(dim.width,dim.height);
+		Configuration.bounds = new Dimension(dim.width/2,dim.height/2);
+		parent = p;
 		
 		this.addKeyListener(game);
 		this.addMouseListener(game);
 		this.addMouseMotionListener(game);
 		this.addMouseWheelListener(game);
+		
+		//this.setCursor(Configuration.hiddenCursor);
+		cursor = new ImageTexture("images/cursor.png");
+	}
+	
+	public void loadGame(String fname,String mname) {
+		game = new Game();
+		this.addKeyListener(game);
+		this.addMouseListener(game);
+		this.addMouseMotionListener(game);
+		this.addMouseWheelListener(game);
+		game.setMap(fname,mname);
+	}
+	
+	public void startGame() {
+		startRequest = true;
+	}
+	
+	public void endGame() {
+		game.stop();
 	}
 	
 	private long lastTime;
@@ -40,8 +56,35 @@ public class RenderCanvas extends GLCanvas implements GLEventListener {
 		glo.glClear(GL.GL_COLOR_BUFFER_BIT);
 		glo.glLoadIdentity();
 		long elapsed = System.nanoTime()-lastTime;
-		game.render(glo);
+		
+		if (startRequest) {
+			game.start();
+			startRequest = false;
+			return;
+		}
+		
+		// Mouse position
+		Point mpos = MouseInfo.getPointerInfo().getLocation();
+		Configuration.mousePosition.x = mpos.x - this.getLocationOnScreen().x - Configuration.bounds.width;
+		Configuration.mousePosition.y = Configuration.bounds.height - mpos.y + this.getLocationOnScreen().y;
+		
 		game.frame(elapsed);
+		if (game.isStarted()) game.render(glo);
+		
+		// Cursor
+		cursor.texture.bind(glo);
+		cursor.texture.enable(glo);
+		glo.glColor3f(1f,1f,1f);
+		glo.glEnable(GL2.GL_TEXTURE_2D);
+		glo.glBegin(GL2.GL_QUADS);
+		glo.glTexCoord2d(0,0); glo.glVertex2d(Configuration.mousePosition.x-cursor.width/2,Configuration.mousePosition.y-cursor.height/2);
+		glo.glTexCoord2d(0,1); glo.glVertex2d(Configuration.mousePosition.x-cursor.width/2,Configuration.mousePosition.y+cursor.height/2);
+		glo.glTexCoord2d(1,1); glo.glVertex2d(Configuration.mousePosition.x+cursor.width/2,Configuration.mousePosition.y+cursor.height/2);
+		glo.glTexCoord2d(1,0); glo.glVertex2d(Configuration.mousePosition.x+cursor.width/2,Configuration.mousePosition.y-cursor.height/2);
+		glo.glEnd();
+		glo.glDisable(GL2.GL_TEXTURE_2D);
+		cursor.texture.disable(glo);
+		
 		lastTime += elapsed;
 	}
 	
@@ -61,8 +104,11 @@ public class RenderCanvas extends GLCanvas implements GLEventListener {
 		glo.glHint(GL2.GL_POLYGON_SMOOTH_HINT,GL.GL_FASTEST);
 		glo.glHint(GL2.GL_LINE_SMOOTH_HINT,GL.GL_FASTEST);
 		
+		//Configuration.gltr = new TextRenderer(new Font("Arial",Font.BOLD,24));
+		
+		cursor.loadTexture();
+		
 		lastTime = System.nanoTime();
-		game.start();
 	}
 	
 	public void reshape(GLAutoDrawable arg0,int arg1,int arg2,int arg3,int arg4) {
