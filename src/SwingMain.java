@@ -1,10 +1,16 @@
+/**
+ * SwingMain
+ * 
+ * Runs an instance of the game.
+ * FOR NORMAL PURPOSES.
+ */
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import com.jogamp.opengl.util.FPSAnimator;
@@ -33,11 +39,11 @@ public class SwingMain implements ActionListener,KeyListener {
 	}
 	
 	public SwingMain(String title) {
-		
 		window = new JFrame(title);
 		window.setBackground(Color.WHITE);
-		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		// Adjust window size to true size (including borders)
 		if (FULLSCREEN) {
 			screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			window.setResizable(false);
@@ -56,19 +62,22 @@ public class SwingMain implements ActionListener,KeyListener {
 		canvas = new RenderCanvas(window,screenSize);
 		animator = new FPSAnimator(canvas,120);
 		
+		// Create screens
 		createMain();
 		createPlay();
 		createInstructions();
 		createOptions();
-		createCards();
 		
-		cards.setBackground(Color.BLUE);
+		// Compile the window together
+		createCards();
 		window.add(cards);
 		deck.show(cards,"mainMenu");
 		window.setVisible(true);
 	}
 	
-	//creates main menu panel
+	/**
+	 * Create the main menu panel.
+	 */
 	public void createMain() {
 		mainMenu = new JPanel();
 		mainMenu.setSize(screenSize);
@@ -135,7 +144,9 @@ public class SwingMain implements ActionListener,KeyListener {
 		playMenu.add(selections);
 	}
 	
-	//creates instructions panel
+	/**
+	 * Create the instructions panel
+	 */
 	private int currentPage = 0;
 	public void createInstructions() {
 		instructions = new JPanel() {
@@ -183,7 +194,9 @@ public class SwingMain implements ActionListener,KeyListener {
 		});
 	}
 	
-	//creates options menu panel
+	/**
+	 * Create then options menu panel
+	 */
 	public void createOptions() {
 		optionsMenu = new JPanel();
 		optionsMenu.setSize(screenSize);
@@ -290,6 +303,9 @@ public class SwingMain implements ActionListener,KeyListener {
 		optionsMenu.add(back, c);
 	}
 	
+	/**
+	 * Put the cards together
+	 */
 	public void createCards() {
 		deck = new CardLayout();
 		cards = new JPanel(deck);
@@ -302,13 +318,16 @@ public class SwingMain implements ActionListener,KeyListener {
 		cards.add(optionsMenu,"optionMenu");
 	}
 	
+	/**
+	 * Override ActionListener.actionPerformed
+	 */
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() instanceof MenuButton) {
+		if (e.getSource() instanceof MenuButton) { // Menu button
 			MenuButton place = ((MenuButton) e.getSource());
 			if (place.target.equals("quitMenu")) System.exit(0);
 			deck.show(cards,place.target);
 		}
-		else if (e.getSource() instanceof SongButton) {
+		else if (e.getSource() instanceof SongButton) { // Song selection
 			SongButton song = ((SongButton) e.getSource());
 			canvas.loadGame(song.songFolder,song.songMap);
 			deck.show(cards,"game");
@@ -317,19 +336,25 @@ public class SwingMain implements ActionListener,KeyListener {
 		}
 	}
 
-	@Override
+	/**
+	 * Override KeyListener.keyTyped
+	 */
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	/**
+	 * Override KeyListener.keyPressed
+	 */
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
+	
+	/**
+	 * Override keyListener.keyReleased
+	 */
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
 		

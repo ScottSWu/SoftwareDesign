@@ -1,3 +1,8 @@
+/**
+ * Vector
+ * 
+ * Provides structure for a vector.
+ */
 
 public class Vector {
 	public double x,y,z;

@@ -1,3 +1,9 @@
+/**
+ * Game implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener
+ * 
+ * Controls game engine.
+ */
+
 import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.event.KeyEvent;
@@ -16,7 +22,6 @@ import funnytrees.JOsu.OsuData.*;
 import funnytrees.JAudioPlayer.*;
 
 public class Game implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener {
-	private Dimension movementField,appearField;
 	
 	// Game variables
 	public long time;
@@ -29,10 +34,11 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	private ArrayList<BulletEntity> bullets;
 	
 	// Graphics
+	private Dimension movementField,appearField;
 	private ImageTexture background;
 	private ImageTexture inputDisplay;
 	
-	// Prototype test
+	// Content
 	private boolean started;
 	private JAudioPlayer audioPlayer;
 	private boolean paused;
@@ -45,16 +51,28 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	// Display animations
 	private double healthAnimation;
 	
+	/**
+	 * Game constructor
+	 */
 	public Game() {
 		appearField = new Dimension(256,192);
 		movementField = new Dimension(320,240);
 	}
 	
+	/**
+	 * Set game map.
+	 * 
+	 * @param sf	Song folder
+	 * @param sm	Song map
+	 */
 	public void setMap(String sf,String sm) {
 		songFolder = sf;
 		songMap = sm;
 	}
 	
+	/**
+	 * Start game
+	 */
 	public void start() {
 		player = new PlayerEntity();
 		enemies = new ArrayList<EnemyEntity>();
@@ -100,20 +118,34 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		healthAnimation = 0;
 	}
 	
+	/**
+	 * Stop game
+	 */
 	public void stop() {
 		started = false;
 		audioPlayer.stop();
 	}
 	
+	/**
+	 * Game started
+	 * 
+	 * @return	boolean: If the game has started
+	 */
 	public boolean isStarted() {
 		return started;
 	}
 	
+	/**
+	 * Render game
+	 * 
+	 * @param glo	GL2: GL object
+	 */
 	public void render(GL2 glo) {
 		//long currentTime = time/1000000;
 		long currentTime = time;
 		EnemyEntity etemp = new EnemyEntity();
 		
+		// Render background
 		if (background!=null) {
 			glo.glEnable(GL2.GL_TEXTURE_2D);
 			background.texture.enable(glo);
@@ -124,6 +156,7 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 			glo.glDisable(GL2.GL_TEXTURE_2D);
 		}
 		
+		// Draw bounding vignette
 		glo.glBegin(GL2.GL_QUADS);
 		float vs = 0.25f,ve = 1f;
 		glo.glColor4f(0f,0f,0f,vs); glo.glVertex2i(movementField.width,-movementField.height);
@@ -148,6 +181,7 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		glo.glEnd();
 		
 		/*
+		// Draw bound outline
 		glo.glBegin(GL2.GL_LINE_LOOP);
 			glo.glColor3f(1f,0f,0f);
 			glo.glVertex2i(-movementField.width,movementField.height);
@@ -157,9 +191,7 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		glo.glEnd();
 		*/
 		
-		//if (glo!=null) return;
 		// Approaching enemies
-		// TODO Need to invert, add to enemies list and let hitoffset be the end of the scan.
 		int color;
 		for (int i=hitoffset; i<map.HitObjects.length && map.HitObjects[i].time<currentTime + approachSpeed; i++) {
 			etemp.position.set(map.HitObjects[i].x - appearField.width,appearField.height - map.HitObjects[i].y);
@@ -211,12 +243,18 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		inputDisplay.texture.disable(glo);
 		glo.glDisable(GL2.GL_TEXTURE_2D);
 		
+		// Score
 		Configuration.gltr.beginRendering(Configuration.screen.width,Configuration.screen.height);
 		Configuration.gltr.setColor(1f,1f,1f,1f);
 		Configuration.gltr.draw(String.valueOf(score),Configuration.screen.width-160,0);
 		Configuration.gltr.endRendering();
 	}
 	
+	/**
+	 * Frame the game.
+	 * 
+	 * @param elapsed	long: Nanoseconds passed
+	 */
 	public void frame(long elapsed) {
 		long currentTime = time;
 		if (audioPlayer==null) return;
@@ -276,6 +314,7 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 			timingoffset++;
 		}
 		
+		// Bullet speed
 		double mspb = 60.0/map.TimingPoints[timingoffset].bpm*map.TimingPoints[timingoffset].meter;
 		
 		// Render entities
@@ -309,8 +348,16 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		if (healthAnimation>120) healthAnimation = 0;
 	}
 	
-	// Drawing
-	protected void drawBox(GL2 glo,double sx,double sy,double ex,double ey) {
+	/**
+	 * Draw a box with a texture.
+	 * 
+	 * @param glo	GL2: GL object
+	 * @param sx	double: Start X
+	 * @param sy	double: Start Y
+	 * @param ex	double: End X
+	 * @param ey	double: End Y
+	 */
+	private void drawBox(GL2 glo,double sx,double sy,double ex,double ey) {
 		glo.glBegin(GL2.GL_QUADS);
 		glo.glTexCoord2d(0,0); glo.glVertex2d(sx,sy);
 		glo.glTexCoord2d(0,1); glo.glVertex2d(sx,ey);
@@ -319,7 +366,20 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		glo.glEnd();
 	}
 	
-	protected void drawBoxPortion(GL2 glo,double sx,double sy,double ex,double ey,double su,double sv,double eu,double ev) {
+	/**
+	 * Draw a box with a partial texture.
+	 * 
+	 * @param glo	GL2: GL Object
+	 * @param sx	double: Start X
+	 * @param sy	double: Start Y
+	 * @param ex	double: End X
+	 * @param ey	double: End Y
+	 * @param su	double: Start U
+	 * @param sv	double: Start V
+	 * @param eu	double: End U
+	 * @param ev	double: End V
+	 */
+	private void drawBoxPortion(GL2 glo,double sx,double sy,double ex,double ey,double su,double sv,double eu,double ev) {
 		glo.glBegin(GL2.GL_QUADS);
 		glo.glTexCoord2d(su,sv); glo.glVertex2d(sx,sy);
 		glo.glTexCoord2d(su,ev); glo.glVertex2d(sx,ey);
@@ -328,17 +388,31 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		glo.glEnd();
 	}
 	
-	protected void drawBoxPortion(GL2 glo,double sx,double sy,double ex,double ey,int su,int sv,int eu,int ev,int width,int height) {
+	/**
+	 * Draw a box with a partial texture.
+	 * 
+	 * @param glo	GL2: GL Object
+	 * @param sx	double: Start X
+	 * @param sy	double: Start Y
+	 * @param ex	double: End X
+	 * @param ey	double: End Y
+	 * @param su	int: Start U
+	 * @param sv	int: Start V
+	 * @param eu	int: End U
+	 * @param ev	int: End V
+	 * @param width	Texture width
+	 * @param height	Texture height
+	 */
+	private void drawBoxPortion(GL2 glo,double sx,double sy,double ex,double ey,int su,int sv,int eu,int ev,int width,int height) {
 		drawBoxPortion(glo,sx,sy,ex,ey,(double) su/width,(double) sv/height,(double) eu/width,(double) ev/height);
 	}
 	
-	public void createEnemy(double x,double y) {
-		EnemyEntity newE = new EnemyEntity();
-		newE.position.set(x,y);
-		enemies.add(newE);
-	}
-
 	// Listeners
+	/**
+	 * Handle key event.
+	 * 
+	 * @param arg0	KeyEvent: Key event
+	 */
 	public void handleKeyEvent(KeyEvent arg0) {
 		if (arg0.getID()==KeyEvent.KEY_PRESSED && arg0.getKeyCode()==KeyEvent.VK_P) {
 			System.out.println("Paused");
@@ -353,10 +427,20 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 		}
 	}
 	
+	/**
+	 * Handle mouse wheel event.
+	 * 
+	 * @param arg0	MouseWheelEvent: Mouse wheel event
+	 */
 	public void handleMouseWheelEvent(MouseWheelEvent arg0) {
 		
 	}
 	
+	/**
+	 * Handle mouse event.
+	 * 
+	 * @param arg0	MouseEvent: Mouse event
+	 */
 	public void handleMouseEvent(MouseEvent arg0) {
 		int cmouse = mouse[0];
 		if (arg0.getID()==MouseEvent.MOUSE_PRESSED) {
@@ -375,55 +459,87 @@ public class Game implements KeyListener,MouseListener,MouseMotionListener,Mouse
 	}
 	
 	// Listener interface methods
+	/**
+	 * Override: MouseWheelListener.mouseWheelMoved
+	 */
 	public void mouseWheelMoved(MouseWheelEvent arg0) {
 		handleMouseWheelEvent(arg0);
 	}
 	
+	/**
+	 * Override: MouseMotionListener.mouseDragged
+	 */
 	public void mouseDragged(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	/**
+	 * Override: MouseMotionListener.mouseMoved
+	 */
 	public void mouseMoved(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	/**
+	 * Override: MouseListener.mouseClicked
+	 */
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	/**
+	 * Override: MouseListener.mouseEntered
+	 */
 	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	/**
+	 * Override: MouseListener.mouseExited
+	 */
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	/**
+	 * Override: MouseListener.mousePresesd
+	 */
 	public void mousePressed(MouseEvent arg0) {
 		handleMouseEvent(arg0);
 	}
 	
+	/**
+	 * Override: MouseListener.mouseReleased
+	 */
 	public void mouseReleased(MouseEvent arg0) {
 		handleMouseEvent(arg0);
 	}
 	
+	/**
+	 * Override: KeyListener.keyPressed
+	 */
 	public void keyPressed(KeyEvent arg0) {
 		keys[arg0.getKeyCode()] = true;
 		handleKeyEvent(arg0);
 	}
 	
+	/**
+	 * Override: KeyListener.keyReleased
+	 */
 	public void keyReleased(KeyEvent arg0) {
 		keys[arg0.getKeyCode()] = false;
 		handleKeyEvent(arg0);
 	}
 	
+	/**
+	 * Override: KeyListener.keyTyped
+	 */
 	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 }

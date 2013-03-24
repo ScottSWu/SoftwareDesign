@@ -1,9 +1,14 @@
+/**
+ * DirectMainTest
+ * 
+ * Runs a direct instance of the game, skipping the main menu.
+ * FOR TESTING PURPOSES ONLY.
+ */
+
 import java.awt.Dimension;
 import java.awt.Toolkit;
-
 import javax.swing.JFrame;
 import com.jogamp.opengl.util.FPSAnimator;
-
 
 public class DirectMainTest {
 	// Options
@@ -39,6 +44,7 @@ public class DirectMainTest {
 		canvas = new RenderCanvas(window,screenSize);
 		window.add(canvas);
 		
+		// Preload song level
 		String songFolder,songMap;
 		//songFolder = "50669 fripSide - only my railgun (TV Size)"; songMap = "fripSide - only my railgun (TV Size) (Kite) [Easy].osu";
 		//songFolder = "66221 Suzuki Konomi - DAYS of DASH"; songMap = "Suzuki Konomi - DAYS of DASH (Rotte) [A32's Hard].osu";
